@@ -1,4 +1,7 @@
-# Monorepo root ó Next.js app in website/
+# Monorepo root ù Next.js app in website/
+
+# Root (npm workspaces)
+/node_modules/
 
 # Dependencies & build
 website/node_modules/

@@ -1,0 +1,10 @@
+{
+  "name": "klaarvooradvies",
+  "private": true,
+  "workspaces": ["website"],
+  "scripts": {
+    "build": "npm run build -w website",
+    "dev": "npm run dev -w website",
+    "lint": "npm run lint -w website"
+  }
+}
