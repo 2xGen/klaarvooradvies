@@ -1,0 +1,25 @@
+# Monorepo root — Next.js app in website/
+
+# Dependencies & build
+website/node_modules/
+website/.next/
+website/out/
+website/build/
+website/coverage/
+website/.vercel/
+
+# Environment
+website/.env*
+!website/.env.example
+
+# Debug & local Next
+website/npm-debug.log*
+website/yarn-debug.log*
+website/yarn-error.log*
+website/*.tsbuildinfo
+website/next-env.d.ts
+
+# OS
+.DS_Store
+Thumbs.db
+*.pem
