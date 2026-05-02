@@ -1,6 +1,6 @@
 "use client";
 
-import { Analytics } from "@vercel/analytics/react";
+import { Analytics } from "@vercel/analytics/next";
 import { useCallback, useEffect, useState } from "react";
 
 import { CookieConsentBar } from "@/components/CookieConsentBar";
