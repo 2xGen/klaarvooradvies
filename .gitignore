@@ -3,7 +3,8 @@
 # Root (npm workspaces)
 /node_modules/
 
-# Dependencies & build
+# Dependencies & build (single lockfile at repo root for npm workspaces)
+website/package-lock.json
 website/node_modules/
 website/.next/
 website/out/
