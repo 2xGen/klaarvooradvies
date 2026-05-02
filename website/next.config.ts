@@ -1,12 +1,15 @@
 import type { NextConfig } from "next";
-import { dirname } from "node:path";
+import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const configDir = dirname(fileURLToPath(import.meta.url));
+/** Repo root (parent of `website/`). Must match Vercel's outputFileTracingRoot or Turbopack breaks native deps (e.g. lightningcss). */
+const monorepoRoot = join(configDir, "..");
 
 const nextConfig: NextConfig = {
+  outputFileTracingRoot: monorepoRoot,
   turbopack: {
-    root: configDir,
+    root: monorepoRoot,
   },
   images: {
     /** Allow `<Image quality={…}>` values used on the site (Next 15.5+ warns otherwise). */
