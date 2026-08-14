@@ -2,14 +2,18 @@ import Link from "next/link";
 import { CookieSettingsTrigger } from "@/components/CookieSettingsTrigger";
 
 const productLinks = [
-  { href: "/situatieschets", label: "Hypotheek-situatieschets (PDF)" },
+  { href: "/situatieschets", label: "Gratis hypotheekoverzicht (PDF)" },
   { href: "/hypotheek", label: "Max. hypotheek — rekenhulp" },
+  { href: "/hypotheek-met-studieschuld", label: "Met studieschuld" },
+  { href: "/hypotheek-met-lening", label: "Met een lening" },
+  { href: "/hypotheek-met-partner", label: "Met partner" },
+  { href: "/hypotheek-als-zzper", label: "Als zzp’er" },
 ];
 
 const infoLinks = [
   { href: "/#hoe-het-werkt", label: "Hoe het werkt" },
   { href: "/gids", label: "Hypotheekgids" },
-  { href: "/#hypotheek-pdf", label: "Wat zit in de hypotheek-PDF?" },
+  { href: "/#hypotheek-pdf", label: "Wat zit in het overzicht?" },
   { href: "/contact", label: "Contact" },
 ];
 
@@ -29,7 +33,7 @@ export function Footer() {
               Klaar<span className="text-primary"> voor </span>advies
             </p>
             <p className="mt-3 text-sm leading-relaxed text-text-muted">
-              Voorbereiding op je hypotheek — PDF en rekenhulp vóór je adviseur.
+              Voorbereiding op je hypotheek — rekenhulp en overzicht vóór je gesprek.
             </p>
           </div>
 
@@ -80,9 +84,9 @@ export function Footer() {
               </li>
             </ul>
             <p className="mt-4 text-xs leading-relaxed text-text-muted">
-              Klaar voor advies is geen hypotheekadviseur en valt niet onder AFM-toezicht. De
-              hypotheek-situatieschets is uitsluitend bedoeld als voorbereiding. Raadpleeg altijd
-              een erkend hypotheek- of financieel adviseur.
+              Klaar voor advies is geen hypotheekadviseur en valt niet onder AFM-toezicht. Het
+              hypotheekoverzicht is bedoeld als voorbereiding. Raadpleeg altijd een erkend
+              hypotheek- of financieel adviseur.
             </p>
           </div>
         </div>
@@ -99,14 +103,10 @@ export function Footer() {
                 className="font-medium text-foreground/90 underline-offset-2 hover:underline"
               >
                 2xGen
-              </a>{" "}
-              ·{" "}
-              <a href="mailto:matthijs@2xgen.com" className="font-medium text-foreground/90 underline-offset-2 hover:underline">
-                matthijs@2xgen.com
               </a>
             </p>
           </div>
-          <p className="max-w-xl sm:text-right">Geen financieel advies — voorbereidingstool.</p>
+          <p className="max-w-xl sm:text-right">Gratis rekenhulp en hypotheekoverzicht.</p>
         </div>
       </div>
     </footer>

@@ -28,13 +28,7 @@ export function GidsHero() {
 
           <p className="mt-5 max-w-xl text-base leading-relaxed text-text-muted sm:text-lg">
             Een hypotheek is waarschijnlijk de grootste financiële beslissing van je leven. Hier leggen
-            we uit hoe het werkt — in gewone taal, zonder iets te verkopen. Zodat je straks bij een
-            adviseur zit met de juiste vragen, niet met een hoofd vol vraagtekens.
-          </p>
-          <p className="mt-4 max-w-xl text-sm leading-relaxed text-text-muted">
-            Dit is <strong className="font-medium text-foreground">geen persoonlijk advies</strong>.
-            Voor een offerte of bindende berekening heb je altijd een{" "}
-            <strong className="font-medium text-foreground">erkend adviseur</strong> nodig.
+            we uit hoe het werkt — in gewone taal, zodat je weet wat je moet vragen.
           </p>
 
           <div className="mt-8">
@@ -50,13 +44,13 @@ export function GidsHero() {
           <p className="mt-8 max-w-xl rounded-xl border border-border-soft/80 bg-surface/80 px-4 py-3 text-xs leading-relaxed text-text-muted shadow-sm backdrop-blur-sm sm:text-sm">
             Combineer deze gids met je{" "}
             <Link href="/situatieschets" className="font-semibold text-primary underline-offset-2 hover:underline">
-              situatieschets
+              hypotheekoverzicht
             </Link>{" "}
             en de{" "}
             <Link href="/hypotheek" className="font-semibold text-primary underline-offset-2 hover:underline">
               rekenhulp
-            </Link>{" "}
-            — dan kloppen woorden én cijfers als je een professional inschakelt.
+            </Link>
+            . Eerst begrijpen, dan je cijfers, dan het gesprek.
           </p>
         </motion.div>
 

@@ -18,11 +18,11 @@ export const HYPOTHEEK_FAQ_ITEMS: { q: string; a: string }[] = [
   },
   {
     q: "Is dit financieel advies?",
-    a: "Nee. Klaar voor advies is een voorbereidingstool. Wij zijn geen adviseur en vallen niet onder AFM-toezicht. Raadpleeg altijd een erkend financieel adviseur voor bindende beslissingen.",
+    a: "Nee. Dit is een rekenhulp om een eerste richting te zien. Bindende keuzes en offertes horen bij een erkend hypotheekadviseur.",
   },
   {
-    q: "Hoe ga ik beter voorbereid naar een adviseur?",
-    a: "Maak je situatieschets — een PDF met jouw cijfers die je meeneemt naar het gesprek. Dat is precies waarvoor Klaar voor advies is gebouwd.",
+    q: "Hoe ga ik van deze berekening naar een gesprek?",
+    a: "Maak je hypotheekoverzicht — een PDF met jouw cijfers. Aan het einde kun je vrijblijvend laten meekijken door een erkend adviseur.",
   },
 ];
 

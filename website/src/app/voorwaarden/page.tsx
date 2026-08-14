@@ -51,7 +51,7 @@ export default function VoorwaardenPage() {
               <strong className="text-foreground">Klaar voor advies</strong> is een voorbereidingstool en informatieve
               website. Wat je hier ziet - inclusief rekenresultaten, situatieschets-PDF en teksten - is{" "}
               <strong className="text-foreground">geen persoonlijk financieel, hypotheek- of verzekeringsadvies</strong>
-              en geen vervanging voor een AFM-erkende adviseur of aanbieder. Bindende beslissingen (hypotheek,
+              en geen vervanging voor een erkend hypotheekadviseur of aanbieder. Bindende beslissingen (hypotheek,
               renteafspraken, verzekeringen) neem je alleen na eigen onderzoek en in overleg met een gekwalificeerde
               partij.
             </p>

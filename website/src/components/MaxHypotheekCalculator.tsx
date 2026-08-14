@@ -307,13 +307,13 @@ export function MaxHypotheekCalculator() {
 
             <p className="mt-5 text-sm leading-relaxed text-white/90">{resultLead}</p>
             <p className="mt-3 text-xs leading-6 text-white/75">
-              Dit is een richting — geen offerte. Een erkend adviseur berekent het exact.
+              Dit is een richting op basis van je invoer. Zet daarna je hele situatie op papier.
             </p>
             <Link
               href="/situatieschets"
               className="mt-5 inline-flex w-full items-center justify-center rounded-xl bg-emerald-500 px-4 py-3 text-center text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-400"
             >
-              Zet je situatie op papier
+              Maak mijn gratis hypotheekoverzicht
             </Link>
           </div>
         </div>

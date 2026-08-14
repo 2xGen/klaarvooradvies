@@ -9,11 +9,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const staticPaths = [
     "",
     "/hypotheek",
+    "/hypotheek-met-studieschuld",
+    "/hypotheek-met-lening",
+    "/hypotheek-met-partner",
+    "/hypotheek-als-zzper",
     "/situatieschets",
     "/contact",
     "/gids",
-    "/verzekeringen",
-    "/pensioen",
     "/privacy",
     "/voorwaarden",
     "/cookies",
@@ -30,7 +32,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     url: path === "" ? `${siteUrl}/` : `${siteUrl}${path}`,
     lastModified,
     changeFrequency: path === "" ? ("weekly" as const) : ("monthly" as const),
-    priority: path === "" ? 1 : path === "/situatieschets" || path === "/hypotheek" ? 0.95 : 0.85,
+    priority: path === "" ? 1 : path === "/situatieschets" || path.startsWith("/hypotheek") ? 0.95 : 0.85,
   }));
 
   return [...main, ...articles];

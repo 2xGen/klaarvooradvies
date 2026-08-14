@@ -7,24 +7,28 @@ import { MotionSection } from "@/components/MotionSection";
 
 const faqs = [
   {
-    q: "Is dit financieel advies?",
-    a: "Nee — alleen voorbereiding. We geven geen hypotheekadvies en zijn niet WFT-vergunningsplichtig. Je situatieschets is een overzicht van jouw gegevens, geen persoonlijk productadvies. Voor bindende keuzes: altijd een erkend hypotheek- of financieel adviseur.",
-  },
-  {
-    q: "Wat gebeurt er met mijn gegevens?",
-    a: "Je gegevens worden gebruikt om jouw PDF te genereren. We verkopen geen data aan derden. Als je een webhook of nieuwsbrief koppelt, gelden daar de voorwaarden van die dienst — houd je privacyverklaring actueel.",
-  },
-  {
     q: "Kost het iets?",
-    a: "De situatieschets is gratis. Altijd.",
+    a: "De rekenhulp en het hypotheekoverzicht zijn gratis. Altijd. Geen account nodig.",
   },
   {
-    q: "Waarom staat er geen maximaal leenbedrag op mijn PDF?",
-    a: "De situatieschets is bedoeld als voorbereiding: jouw cijfers en vragen op papier voor je adviseur — geen product of offerte. Een bindend leenbedrag hoort bij je dossier en je adviseur. Wil je zelf een ruwe berekening? Probeer de snelle rekenhulp op de homepage of de rekenhulp op de hypotheekpagina.",
+    q: "Hoeveel hypotheek kan ik krijgen met een studieschuld?",
+    a: "Een studieschuld verlaagt je maximale hypotheek, maar niet euro voor euro. Banken rekenen met een fictieve maandlast. Vul je studieschuld in de rekenhulp in voor een eerste indicatie, en zet daarna je volledige situatie in het hypotheekoverzicht.",
   },
   {
-    q: "Kan ik de PDF delen met mijn adviseur?",
-    a: "Ja — dat is precies het idee. Download je hypotheek-situatieschets, stuur hem mee of neem hem mee, en loop voorbereid je hypotheekgesprek in.",
+    q: "Telt het inkomen van mijn partner mee?",
+    a: "Ja, meestal gedeeltelijk. Het tweede inkomen telt mee in de toets, vaak niet voor 100%. Vul beide inkomens in de rekenhulp in en maak daarna één gezamenlijk overzicht.",
+  },
+  {
+    q: "Kan ik mijn overzicht laten meekijken door een adviseur?",
+    a: "Ja. Aan het einde van je hypotheekoverzicht kun je vrijblijvend aangeven dat een erkend hypotheekadviseur mag meekijken. Geen verplichting — je krijgt binnen één werkdag reactie.",
+  },
+  {
+    q: "Kan ik de PDF meenemen naar mijn eigen adviseur?",
+    a: "Ja. Het overzicht is van jou. Je kunt het naar iedere erkende hypotheekadviseur meenemen of doorsturen.",
+  },
+  {
+    q: "Is dit hypotheekadvies?",
+    a: "Nee. Klaar voor advies helpt je je situatie op een rij te zetten. Bindende keuzes, offertes en een maximaal leenbedrag horen bij een erkend hypotheekadviseur.",
   },
 ];
 
@@ -35,10 +39,10 @@ export function Faq() {
     <MotionSection className="bg-surface py-16 sm:py-20">
       <div className="mx-auto max-w-3xl px-4 sm:px-6">
         <h2 className="font-display text-center text-3xl font-semibold text-foreground sm:text-4xl md:text-5xl">
-          Vragen die we vaak horen
+          Kort beantwoord
         </h2>
         <p className="mx-auto mt-2 max-w-lg text-center text-sm text-text-muted">
-          Klik gerust open — kort en duidelijk antwoord.
+          Het overzicht is van jou. Het gesprek is optioneel.
         </p>
 
         <div className="mt-10 space-y-3">

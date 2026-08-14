@@ -180,13 +180,13 @@ export default async function GidsArticlePage({ params }: Props) {
                 Voorbereiding
               </span>
               <span className="mt-2 font-display text-lg text-foreground">
-                Situatieschets (PDF)
+                Gratis hypotheekoverzicht
               </span>
               <span className="mt-2 text-sm leading-relaxed text-text-muted">
-                Zet je cijfers op papier voor het gesprek met een adviseur.
+                Zet je cijfers op één PDF. Daarna kun je het laten meekijken.
               </span>
               <span className="mt-4 text-sm font-semibold text-primary group-hover:underline">
-                Start situatieschets →
+                Maak mijn overzicht →
               </span>
             </Link>
           </div>
@@ -198,9 +198,12 @@ export default async function GidsArticlePage({ params }: Props) {
         >
           <div className="rounded-2xl border border-border-soft bg-surface-muted/30 p-6 text-sm leading-relaxed text-text-muted">
             <p>
-              <strong className="font-medium text-foreground">Let op:</strong> dit artikel is
-              algemene informatie en geen persoonlijk hypotheekadvies. Voor jouw situatie schakel je
-              een erkend hypotheek- of financieel adviseur in.
+              Dit artikel is algemene informatie, geen persoonlijk hypotheekadvies. Wil je jouw
+              cijfers op een rij?{" "}
+              <Link href="/situatieschets" className="font-semibold text-primary underline-offset-2 hover:underline">
+                Maak een gratis hypotheekoverzicht
+              </Link>
+              .
             </p>
           </div>
         </MotionSection>

@@ -9,8 +9,8 @@ export const GIDS_FAQ_ITEMS: { q: string; a: string }[] = [
     a: "Nee. KlaarVoorAdvies is een voorbereidingstool. We zijn geen tussenpersoon en geen vergunningsplichtig advieskantoor.",
   },
   {
-    q: "Hoe past deze gids bij de situatieschets?",
-    a: "De gids geeft context — wat termen betekenen en hoe het proces werkt. De situatieschets zet jouw eigen cijfers op papier. Samen zorgen ze dat je goed voorbereid een adviseursgesprek ingaat.",
+    q: "Hoe past deze gids bij het hypotheekoverzicht?",
+    a: "De gids legt begrippen uit. Het hypotheekoverzicht zet jouw cijfers op papier. Samen zorg je dat je weet waar je staat voordat je een gesprek ingaat.",
   },
   {
     q: 'Waarom staat er nog "Binnenkort" bij sommige onderwerpen?',
@@ -26,7 +26,7 @@ export const GIDS_FAQ_ITEMS: { q: string; a: string }[] = [
   },
   {
     q: "Ik wil nu al persoonlijk advies. Waar ga ik naartoe?",
-    a: "Zoek een erkend hypotheekadviseur via het AFM-register op afm.nl. Maak eerst je situatieschets aan — dan loop je beter voorbereid dat gesprek in.",
+    a: "Maak eerst je hypotheekoverzicht. Aan het einde kun je vrijblijvend aangeven dat een erkend adviseur mag meekijken — binnen één werkdag reactie, zonder verplichting.",
   },
 ];
 

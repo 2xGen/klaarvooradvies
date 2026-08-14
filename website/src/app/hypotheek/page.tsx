@@ -4,12 +4,13 @@ import { HypotheekFaq } from "@/components/HypotheekFaq";
 import { MaxHypotheekCalculator } from "@/components/MaxHypotheekCalculator";
 import { MotionSection } from "@/components/MotionSection";
 import { hypotheekFaqJsonLd } from "@/lib/hypotheekFaq";
+import { HYPOTHEEK_TOPIC_NAV } from "@/lib/hypotheekTopicPages";
 
 export const metadata: Metadata = {
   title:
     "Maximale hypotheek berekenen 2026 — rekenhulp met LTI, NHG en schulden",
   description:
-    "Bereken snel je maximale hypotheek op basis van inkomen, schulden en rente. Inclusief NHG-check, LTI-uitleg en kosten koper — gratis, geen advies, geen account.",
+    "Bereken snel je maximale hypotheek op basis van inkomen, schulden en rente. Inclusief NHG-check, LTI-uitleg en kosten koper — gratis, zonder account.",
   alternates: { canonical: "/hypotheek" },
   keywords: [
     "maximale hypotheek berekenen",
@@ -28,7 +29,7 @@ export const metadata: Metadata = {
     title:
       "Maximale hypotheek berekenen 2026 — rekenhulp met LTI, NHG en schulden",
     description:
-      "Bereken snel je maximale hypotheek op basis van inkomen, schulden en rente. NHG-check, LTI-uitleg en kosten koper — gratis, geen advies.",
+      "Bereken snel je maximale hypotheek op basis van inkomen, schulden en rente. NHG-check, LTI-uitleg en kosten koper — gratis, zonder account.",
   },
 };
 
@@ -51,9 +52,8 @@ export default function HypotheekPage() {
               Hoeveel kan ik lenen? <span className="text-primary">Bereken je maximale hypotheek</span>
             </h1>
             <p className="mx-auto mt-4 max-w-2xl text-center text-base leading-relaxed text-text-muted">
-              Vul je inkomen en schulden in — je ziet direct een eerste richting. Geen
-              bankberekening, geen advies, wel een eerlijk startpunt voor je
-              hypotheekgesprek.
+              Vul je inkomen en schulden in — je ziet direct een eerste richting. Daarna kun je je
+              volledige situatie op één PDF zetten.
             </p>
             <p className="mx-auto mt-3 max-w-2xl text-center text-sm text-text-muted">
               <Link
@@ -182,17 +182,17 @@ export default function HypotheekPage() {
               </p>
               <ul className="mt-4 list-disc space-y-2 pl-5 text-base leading-relaxed text-text-muted">
                 <li>
-                  DUO-schuld na september 2015: 0,45% van de oorspronkelijke schuld per maand
+                  DUO-schuld na september 2015: 0,35% van de oorspronkelijke schuld per maand
                 </li>
                 <li>
-                  DUO-schuld vóór september 2015: 0,75% van de oorspronkelijke schuld per maand
+                  DUO-schuld vóór september 2015: 0,65% van de oorspronkelijke schuld per maand
                 </li>
               </ul>
               <div className="mt-4 space-y-4 text-base leading-relaxed text-text-muted">
                 <p>
                   <strong className="font-medium text-foreground">Voorbeeld:</strong> €25.000
-                  studieschuld (na 2015) = €112,50 fictieve maandlast → verlaagt je maximale hypotheek
-                  met circa €27.000.
+                  studieschuld (na 2015) = €87,50 fictieve maandlast. Vul het in de rekenhulp in om te
+                  zien wat dat met jouw indicatie doet.
                 </p>
                 <p>
                   Vul je studieschuld in de rekenhulp in — de calculator houdt hier rekening mee.
@@ -205,8 +205,8 @@ export default function HypotheekPage() {
               <p className="mt-2 text-sm leading-relaxed text-text-muted">
                 Gebruik de rekenhulp voor een <strong className="font-medium text-foreground">richting</strong>{" "}
                 en deze pagina voor <strong className="font-medium text-foreground">begrippen</strong>.
-                Laat een erkend adviseur je dossier en bankopties beoordelen voordat je bindende keuzes
-                maakt.
+                Zet daarna je volledige situatie op papier — dan heb je iets om het gesprek mee in te
+                gaan.
               </p>
               <div className="mt-4 flex flex-wrap gap-3">
                 <Link
@@ -231,11 +231,10 @@ export default function HypotheekPage() {
         <section className="border-t border-border-soft/80 bg-background py-14 sm:py-16">
           <div className="mx-auto max-w-3xl px-4 sm:px-6">
             <h2 className="font-display text-center text-2xl font-normal text-foreground sm:text-3xl">
-              Eén tool is niet genoeg — gebruik ze samen
+              Eerst rekenen. Dan overzicht. Dan het gesprek.
             </h2>
             <p className="mx-auto mt-3 max-w-xl text-center text-sm leading-relaxed text-text-muted">
-              Stap voor stap: eerst een richting, dan je cijfers vastleggen, dan dieper lezen waar je
-              wilt.
+              Een berekening op alleen inkomen is een startpunt. Zet daarna je hele situatie op papier.
             </p>
 
             <div className="mt-10 overflow-hidden rounded-2xl border border-border-soft bg-surface shadow-sm">
@@ -260,11 +259,11 @@ export default function HypotheekPage() {
                   <tr>
                     <td className="px-4 py-4 font-medium text-foreground sm:px-5">
                       <Link href="/situatieschets" className="text-primary underline-offset-2 hover:underline">
-                        Situatieschets (PDF)
+                        Hypotheekoverzicht (PDF)
                       </Link>
                     </td>
                     <td className="px-4 py-4 sm:px-5">
-                      Jouw cijfers op papier voor het adviseursgesprek
+                      Jouw cijfers op papier — daarna kun je het laten meekijken
                     </td>
                   </tr>
                   <tr>
@@ -280,6 +279,22 @@ export default function HypotheekPage() {
                 </tbody>
               </table>
             </div>
+
+            <p className="mt-10 text-center text-sm font-semibold text-foreground">
+              Bereken voor jouw situatie
+            </p>
+            <ul className="mt-4 flex flex-wrap justify-center gap-2">
+              {HYPOTHEEK_TOPIC_NAV.filter((l) => l.href !== "/hypotheek").map((l) => (
+                <li key={l.href}>
+                  <Link
+                    href={l.href}
+                    className="inline-flex rounded-full border border-border-soft bg-surface px-4 py-2 text-sm font-medium text-foreground transition hover:border-primary"
+                  >
+                    {l.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
           </div>
         </section>
       </main>

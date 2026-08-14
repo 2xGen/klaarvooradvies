@@ -19,7 +19,7 @@ export function HypotheekFaq() {
           Veelgestelde vragen
         </h2>
         <p className="mx-auto mt-3 max-w-2xl text-center text-sm leading-relaxed text-text-muted">
-          Korte antwoorden over deze rekenhulp — geen advies, geen bankbrief.
+          Korte antwoorden over deze rekenhulp.
         </p>
 
         <div className="mt-10 space-y-3">
@@ -70,7 +70,7 @@ export function HypotheekFaq() {
             href="/situatieschets"
             className="inline-flex items-center gap-2 rounded-full bg-emerald-600 px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700"
           >
-            Maak mijn situatieschets
+            Maak mijn hypotheekoverzicht
           </Link>
         </div>
       </div>

@@ -17,7 +17,7 @@ export default function PrivacyPage() {
           <h1 className="font-display text-3xl font-normal text-foreground sm:text-4xl">
             Privacyverklaring
           </h1>
-          <p className="mt-3 text-sm text-text-muted">Laatst bijgewerkt: mei 2026 - domein klaarvooradvies.nl</p>
+          <p className="mt-3 text-sm text-text-muted">Laatst bijgewerkt: augustus 2026 - domein klaarvooradvies.nl</p>
         </MotionSection>
 
         <MotionSection className="mt-10 space-y-6 text-sm leading-relaxed text-text-muted" delay={0.05}>
@@ -59,10 +59,15 @@ export default function PrivacyPage() {
                 wanneer je het formulier verstuurt, om je vraag te beantwoorden.
               </li>
               <li>
-                <strong className="text-foreground">Situatieschets (wizard)</strong> - de gegevens die jij in de
-                tool invult. De PDF wordt op jouw apparaat gegenereerd. Alleen als je aan het einde expliciet kiest
-                voor contact met een adviseur en geldige contactgegevens invult, kunnen wij die lead met een partner
-                delen of opslaan voor opvolging, zoals in de tool beschreven.
+                <strong className="text-foreground">Hypotheekoverzicht (wizard)</strong> — de gegevens die jij
+                invult, blijven op jouw apparaat tot je een PDF downloadt (die maak je lokaal). Alleen als je
+                aan het einde je contactgegevens invult en het verzoek verstuurt, slaan wij je naam,
+                e-mailadres, telefoonnummer, toestemmingstijdstip en relevante gegevens uit je
+                hypotheekoverzicht op (indicatief leenbedrag, aanleiding, tijdlijn, inkomen,
+                studieschuld-maandlast, of je met een partner aanvraagt, en eventuele opmerking), en geven we
+                die door aan een erkend hypotheekadviseur. Doel: dit verzoek vrijblijvend opvolgen. Geen
+                andere marketing. Je kunt ook alleen de PDF downloaden; dan gaan er geen contactgegevens mee.
+                De PDF-download zelf stuurt geen contactgegevens.
               </li>
               <li>
                 <strong className="text-foreground">Technische beveiliging</strong> - verborgen spam-velden

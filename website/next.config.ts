@@ -46,12 +46,17 @@ const nextConfig: NextConfig = {
     return [
       { source: "/hypotheek-onpager", destination: "/situatieschets", permanent: true },
       { source: "/hypotheek-berekenen", destination: "/hypotheek", permanent: true },
+      { source: "/maximale-hypotheek", destination: "/hypotheek", permanent: true },
+      { source: "/hypotheek-met-schuld", destination: "/hypotheek-met-lening", permanent: true },
+      { source: "/hypotheek-berekenen-met-schuld", destination: "/hypotheek-met-lening", permanent: true },
       { source: "/whatsapp", destination: "/contact", permanent: false },
       { source: "/werken-in-finance", destination: "/", permanent: false },
       { source: "/financiele-vraag", destination: "/", permanent: false },
       { source: "/hoeveel-hypotheek-kan-ik-krijgen-2026", destination: "/hypotheek", permanent: true },
       { source: "/eerste-huis-kopen-stappenplan", destination: "/", permanent: false },
       { source: "/hypotheek-regels-2026", destination: "/", permanent: false },
+      { source: "/verzekeringen", destination: "/", permanent: true },
+      { source: "/pensioen", destination: "/", permanent: true },
     ];
   },
 };

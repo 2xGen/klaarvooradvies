@@ -7,7 +7,7 @@ import { MotionSection } from "@/components/MotionSection";
 export const metadata: Metadata = {
   title: "Contact",
   description:
-    "Vragen over de tool, privacy of samenwerking. Voor orientatie of een adviseur: start met de situatieschets.",
+    "Vragen over de tool, privacy of samenwerking. Voor een hypotheekgesprek: start met je overzicht.",
   alternates: { canonical: "/contact" },
 };
 
@@ -23,32 +23,28 @@ export default function ContactPage() {
             Contact
           </h1>
           <p className="mt-4 text-base leading-relaxed text-text-muted">
-            Heb je vragen over deze tool, samenwerking of je privacy? Vul het formulier hieronder in.
-            We zijn geen adviseursdesk: voor een bindende hypotheek- of verzekeringsbeslissing moet je
-            altijd bij een erkend adviseur terecht.
+            Vragen over de tool, samenwerking of je privacy? Vul het formulier in.
           </p>
           <ContactForm />
         </MotionSection>
 
         <MotionSection className="mt-10 rounded-2xl border border-border-soft bg-surface p-6 text-left text-sm leading-relaxed text-text-muted">
-          <h2 className="font-display text-lg text-foreground">Hypotheekadviseur (ook voor orientatie)</h2>
+          <h2 className="font-display text-lg text-foreground">Wil je je hypotheek bespreken?</h2>
           <p className="mt-3">
-            We werken samen met <strong className="font-medium text-foreground">AFM-erkende hypotheekadviseurs</strong>.
-            Wil je in contact met een adviseur over je hypotheek — ook als het alleen om orientatie
-            gaat — dan raden we aan om eerst de{" "}
+            We werken samen met <strong className="font-medium text-foreground">erkende hypotheekadviseurs</strong>.
+            De snelste weg: maak eerst je{" "}
             <Link href="/situatieschets" className="font-semibold text-primary underline-offset-2 hover:underline">
-              situatieschets
-            </Link>{" "}
-            in te vullen. Daarmee maak je een duidelijke situatieschets en kun je aan het einde,
-            als je dat wilt, vrijblijvend een meekijk door een adviseur aanvragen. Zo sluit het
-            gesprek beter aan bij jouw situatie.
+              hypotheekoverzicht
+            </Link>
+            . Aan het einde kun je vrijblijvend aangeven dat een adviseur mag meekijken — binnen één
+            werkdag reactie, zonder verplichting.
           </p>
           <p className="mt-4">
             <Link
               href="/situatieschets"
               className="inline-flex min-h-[44px] items-center justify-center rounded-full border border-primary/30 bg-background px-5 py-2.5 text-sm font-semibold text-primary transition hover:border-primary hover:bg-success-light"
             >
-              Naar de situatieschets
+              Naar het hypotheekoverzicht
             </Link>
           </p>
         </MotionSection>

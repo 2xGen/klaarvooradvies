@@ -28,17 +28,18 @@ const defaultOgImage =
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "Klaar voor advies — hypotheek voorbereiden",
+    default: "Hoeveel hypotheek kun je krijgen? Gratis berekenen | Klaar voor advies",
     template: "%s | Klaar voor advies",
   },
   description:
-    "Voorbereid op je hypotheekgesprek: gratis situatieschets (PDF) met je cijfers op een rij, plus rekenhulp als je zelf wilt rekenen. Geen hypotheekadvies — wel houvast vóór je adviseur.",
+    "Bereken wat je ongeveer kunt lenen en maak gratis een persoonlijk hypotheekoverzicht. Geen account. Daarna kun je het laten meekijken door een erkend adviseur.",
   keywords: [
     "klaar voor advies",
-    "hypotheek situatieschets",
+    "hoeveel hypotheek kan ik krijgen",
+    "maximale hypotheek berekenen",
+    "gratis hypotheekoverzicht",
+    "hypotheek berekenen",
     "hypotheek voorbereiden",
-    "hypotheekgesprek",
-    "hypotheek checklist",
   ],
   openGraph: {
     type: "website",

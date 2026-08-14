@@ -25,7 +25,7 @@ const INTEREST_RATE = 3.5;
 
 /** Prefill voor opmerkingen bij vrijwillig adviseurscontact */
 const DEFAULT_ADVISOR_NOTE =
-  "Beste adviseur, dit is mijn situatieschets. Ik wil graag kort sparren over mijn mogelijkheden.";
+  "Beste adviseur, dit is mijn hypotheekoverzicht. Ik wil graag kort sparren over mijn mogelijkheden.";
 
 type AanleidingId = "eerste-huis" | "doorstromen" | "oversluiten" | "tweede-hypotheek";
 type AanvragersId = "alleen" | "met-partner";
@@ -120,10 +120,11 @@ function effectiveVariableAnnual(amount: number, certainty: "structureel" | "inc
 }
 
 function totalSteps(hasPartner: boolean) {
-  return hasPartner ? 9 : 8;
+  return hasPartner ? 7 : 6;
 }
 
 function displayStepNumber(internalStep: number, hasPartner: boolean): number {
+  if (internalStep >= 8) return hasPartner ? 7 : 6;
   if (!hasPartner && internalStep >= 5) return internalStep - 1;
   return internalStep;
 }
@@ -131,11 +132,12 @@ function displayStepNumber(internalStep: number, hasPartner: boolean): number {
 function nextInternalStep(current: number, hasPartner: boolean): number {
   if (current === 3) return hasPartner ? 4 : 5;
   if (current === 4) return 5;
+  if (current === 6) return 9;
   return Math.min(9, current + 1);
 }
 
 function prevInternalStep(current: number, hasPartner: boolean): number {
-  if (current === 9) return 8;
+  if (current === 9) return 6;
   if (current === 5) return hasPartner ? 4 : 3;
   if (current === 4) return 3;
   return Math.max(1, current - 1);
@@ -354,7 +356,11 @@ export function HypotheekOnepagerWizard() {
   const [zoektHypotheekAdvies, setZoektHypotheekAdvies] = useState<"ja" | "nee" | null>(null);
   const [company, setCompany] = useState("");
   const [downloadBusy, setDownloadBusy] = useState(false);
+  const [submitBusy, setSubmitBusy] = useState(false);
   const [leadMessage, setLeadMessage] = useState<string | null>(null);
+  const [leadSent, setLeadSent] = useState(false);
+  const [contactAttempted, setContactAttempted] = useState(false);
+  const [consentRecordedAt, setConsentRecordedAt] = useState<string | null>(null);
 
   const hasPartner = aanvragers === "met-partner";
   const ts = totalSteps(hasPartner);
@@ -375,19 +381,12 @@ export function HypotheekOnepagerWizard() {
     else if (sd > 0 && studyDebtSystem === "none") setStudyDebtSystem("new");
   }, [studyDebt, studyDebtSystem]);
 
-  /** Subtiele prefilling na keuze „ja” — alleen als het veld nog leeg is */
+  /** Laatste stap is het gesprek — ja is de hoofdroute. */
   useEffect(() => {
-    if (zoektHypotheekAdvies !== "ja") return;
+    if (step !== 9) return;
+    setZoektHypotheekAdvies("ja");
     setNotes((prev) => (prev.trim() === "" ? DEFAULT_ADVISOR_NOTE : prev));
-  }, [zoektHypotheekAdvies]);
-
-  /** Verwijder standaardtekst als iemand teruggaat naar alleen-PDF */
-  useEffect(() => {
-    if (zoektHypotheekAdvies !== "nee") return;
-    setNotes((prev) =>
-      prev.trim() === DEFAULT_ADVISOR_NOTE.trim() ? "" : prev,
-    );
-  }, [zoektHypotheekAdvies]);
+  }, [step]);
 
   const birthIso = useMemo(
     () => buildBirthIso(birthDay, birthMonth, birthYear),
@@ -710,13 +709,13 @@ export function HypotheekOnepagerWizard() {
     return eigenOk && tijdOk && owOk;
   }
 
-  function step8Ok() {
-    return zoektHypotheekAdvies !== null;
-  }
-
-  /** Contactpagina na keuze „Ja”; velden optioneel voor PDF, lead pas bij complete invoer */
+  /** Contact: naam, e-mail en telefoon verplicht — lead gaat bij versturen, niet bij PDF. */
   function step9Ok() {
-    return true;
+    const nameOk = voornaam.trim().length >= 2 && achternaam.trim().length >= 1;
+    const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
+    const digits = phone.replace(/\D/g, "");
+    const phoneOk = digits.length >= 9 && digits.length <= 15;
+    return nameOk && emailOk && phoneOk && !emailError;
   }
 
   function canProceed(): boolean {
@@ -734,9 +733,8 @@ export function HypotheekOnepagerWizard() {
       case 6:
         return step6Ok();
       case 7:
-        return true;
       case 8:
-        return step8Ok();
+        return true;
       case 9:
         return step9Ok();
       default:
@@ -919,9 +917,8 @@ export function HypotheekOnepagerWizard() {
     ],
   );
 
-  async function handleDownloadPdf() {
+  async function handleDownloadPdf(opts?: { advisorOptIn?: boolean }) {
     setDownloadBusy(true);
-    setLeadMessage(null);
     try {
       const blob = buildHypotheekOnepagerPdf(pdfPayload);
       const url = URL.createObjectURL(blob);
@@ -933,70 +930,96 @@ export function HypotheekOnepagerWizard() {
       a.click();
       URL.revokeObjectURL(url);
 
-      const sendLead =
-        zoektHypotheekAdvies === "ja" &&
-        voornaam.trim().length >= 2 &&
-        achternaam.trim().length >= 1 &&
-        /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim()) &&
-        (() => {
-          const phoneDigits = phone.replace(/\D/g, "");
-          return phoneDigits.length >= 9 && phoneDigits.length <= 15;
-        })();
-
       void fetch("/api/situatieschets-pdf-event", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           hasPartner,
-          advisorOptIn: zoektHypotheekAdvies === "ja",
-          leadEligible: sendLead,
+          advisorOptIn: opts?.advisorOptIn ?? zoektHypotheekAdvies === "ja",
+          leadEligible: leadSent,
         }),
       }).catch(() => {});
-
-      if (sendLead) {
-        const res = await fetch("/api/hypotheek-lead", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            company,
-            advisorContactConsent: true,
-            zoektHypotheekAdvies,
-            email: email.trim(),
-            name: pdfPayload.fullName.trim(),
-            phone: phone.trim(),
-            notes: notes.trim() || undefined,
-            estimatedMax,
-            aanleiding,
-            tijdlijn,
-            grossIncome,
-            interestRate: INTEREST_RATE,
-            studyMonthly,
-            hasPartner,
-            consentRecordedAt: new Date().toISOString(),
-          }),
-        });
-        const data = (await res.json().catch(() => ({}))) as { ok?: boolean; stored?: boolean };
-        if (res.ok && data.ok && data.stored) {
-          setLeadMessage(
-            "Bedankt — we nemen contact op voor een vrijblijvend gesprek. Je PDF staat in je downloads.",
-          );
-        } else if (res.ok) {
-          setLeadMessage("Je PDF staat in je downloads. Vragen? Zie de contactpagina.");
-        } else {
-          setLeadMessage("Je PDF staat in je downloads.");
-        }
-      } else {
-        setLeadMessage(null);
-      }
     } finally {
       setDownloadBusy(false);
     }
   }
 
-  function handleSubmitForm() {
+  async function submitAdvisorLead(): Promise<{ ok: boolean; stored: boolean; error?: string }> {
+    const recordedAt = consentRecordedAt ?? new Date().toISOString();
+    const res = await fetch("/api/hypotheek-lead", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        company,
+        advisorContactConsent: true,
+        zoektHypotheekAdvies: "ja",
+        email: email.trim(),
+        name: `${voornaam.trim()} ${achternaam.trim()}`.trim(),
+        phone: phone.trim(),
+        notes: notes.trim() || undefined,
+        estimatedMax,
+        aanleiding,
+        tijdlijn,
+        grossIncome,
+        interestRate: INTEREST_RATE,
+        studyMonthly,
+        hasPartner,
+        consentRecordedAt: recordedAt,
+      }),
+    });
+    const data = (await res.json().catch(() => ({}))) as {
+      ok?: boolean;
+      stored?: boolean;
+      error?: string;
+    };
+    if (!res.ok) {
+      return { ok: false, stored: false, error: data.error ?? "Kon verzoek niet verwerken." };
+    }
+    if (!consentRecordedAt) setConsentRecordedAt(recordedAt);
+    return { ok: true, stored: data.stored === true };
+  }
+
+  async function handleSubmitForm() {
+    if (step !== 9) return;
+    setContactAttempted(true);
     validateEmailBlur();
-    if (step === 8 && !step8Ok()) return;
-    if (step === 9 && !step9Ok()) return;
+    if (!step9Ok()) return;
+    if (leadSent) {
+      setPhase("done");
+      return;
+    }
+
+    setZoektHypotheekAdvies("ja");
+    setSubmitBusy(true);
+    setLeadMessage(null);
+    try {
+      const result = await submitAdvisorLead();
+      if (!result.ok) {
+        setLeadMessage(result.error ?? "Er ging iets mis. Probeer het opnieuw.");
+        return;
+      }
+      if (result.stored) {
+        setLeadSent(true);
+        setLeadMessage(
+          "Bedankt — een adviseur neemt vrijblijvend contact op. Download hieronder je PDF.",
+        );
+      } else {
+        setLeadMessage(
+          "Je overzicht is klaar, maar je contactverzoek is niet opgeslagen. Gebruik de contactpagina of probeer het opnieuw.",
+        );
+      }
+      setPhase("done");
+    } catch {
+      setLeadMessage("Er ging iets mis. Probeer het opnieuw.");
+    } finally {
+      setSubmitBusy(false);
+    }
+  }
+
+  async function handlePdfOnly() {
+    setZoektHypotheekAdvies("nee");
+    setNotes((prev) => (prev.trim() === DEFAULT_ADVISOR_NOTE.trim() ? "" : prev));
+    await handleDownloadPdf({ advisorOptIn: false });
     setPhase("done");
   }
 
@@ -1033,10 +1056,14 @@ export function HypotheekOnepagerWizard() {
             </svg>
           </div>
           <h2 className="font-display text-center text-2xl font-normal text-[#2c2a26]">
-            Je situatieschets is klaar.
+            Je hypotheekoverzicht is klaar.
           </h2>
           <p className="mt-3 text-center text-sm leading-relaxed text-[#6f6b64]">
-            Download je PDF en neem hem mee naar je adviseur.
+            {zoektHypotheekAdvies === "ja"
+              ? leadSent
+                ? "Je verzoek is ontvangen. Een adviseur neemt vrijblijvend contact op. Download je PDF als naslag."
+                : "Download je PDF. Je contactverzoek is niet opgeslagen — gebruik de contactpagina als je alsnog wilt sparren."
+              : "Download je PDF. Wil je daarna weten wat deze cijfers voor jouw mogelijkheden betekenen?"}
           </p>
 
           <div className="mt-8 flex flex-col gap-3">
@@ -1047,7 +1074,7 @@ export function HypotheekOnepagerWizard() {
               className="inline-flex min-h-[48px] items-center justify-center rounded-xl px-5 text-base font-semibold text-white shadow-md transition hover:opacity-95 disabled:opacity-60"
               style={{ background: GREEN }}
             >
-              {downloadBusy ? "Bezig…" : "↓ Download mijn situatieschets (PDF)"}
+              {downloadBusy ? "Bezig…" : "↓ Download mijn hypotheekoverzicht (PDF)"}
             </button>
           </div>
 
@@ -1057,18 +1084,40 @@ export function HypotheekOnepagerWizard() {
             </p>
           )}
 
-          <div
-            className="mt-6 rounded-xl px-4 py-3 text-sm leading-relaxed"
-            style={{ background: "#E8F5EE", color: "#2c2a26" }}
-          >
-            Bewaar je PDF goed — dit is jouw voorbereiding voor het adviseursgesprek. Een erkend
-            adviseur beoordeelt jouw situatie definitief.
-          </div>
+          {zoektHypotheekAdvies !== "ja" && (
+            <div
+              className="mt-6 rounded-xl border px-4 py-4 text-left"
+              style={{ borderColor: CARD_BORDER, background: "#E8F5EE" }}
+            >
+              <p className="text-sm font-semibold text-[#2c2a26]">Wil je weten wat je hiermee kunt?</p>
+              <p className="mt-2 text-sm leading-relaxed text-[#5c5852]">
+                Je overzicht is klaar. De volgende stap is bepalen wat je cijfers betekenen voor jouw
+                hypotheekmogelijkheden. Vrijblijvend, binnen één werkdag reactie.
+              </p>
+              <button
+                type="button"
+                onClick={() => {
+                  setZoektHypotheekAdvies("ja");
+                  setPhase("form");
+                  setStep(9);
+                }}
+                className="mt-4 inline-flex min-h-[44px] w-full items-center justify-center rounded-xl px-5 text-sm font-semibold text-white shadow-md transition hover:opacity-95"
+                style={{ background: GREEN }}
+              >
+                Bespreek mijn situatie
+              </button>
+            </div>
+          )}
 
-          <p className="mt-6 text-center text-xs leading-relaxed text-[#6f6b64]">
-            Geen financieel advies. KlaarVoorAdvies is een voorbereidingstool. Raadpleeg altijd een
-            erkend financieel adviseur voor bindende beslissingen.
-          </p>
+          {zoektHypotheekAdvies === "ja" && leadSent && (
+            <div
+              className="mt-6 rounded-xl px-4 py-3 text-sm leading-relaxed"
+              style={{ background: "#E8F5EE", color: "#2c2a26" }}
+            >
+              We gebruiken je gegevens alleen om dit verzoek op te volgen — niet voor andere marketing.
+              Wil je ze laten verwijderen? Mail via de contactpagina.
+            </div>
+          )}
         </div>
       </div>
     );
@@ -1078,7 +1127,7 @@ export function HypotheekOnepagerWizard() {
     <div className="mx-auto max-w-xl" style={{ fontFamily: "var(--font-dm-sans), sans-serif" }}>
       <div className="mb-4">
         <p className="text-sm font-semibold text-[#2c2a26]">
-          Stap {displayStep} van {ts}
+          {step >= 8 ? "Je overzicht is klaar" : `Stap ${displayStep} van ${ts}`}
         </p>
         <div className="mt-2 h-2 w-full overflow-hidden rounded-full" style={{ background: "#E0DDD6" }}>
           <div
@@ -1154,7 +1203,7 @@ export function HypotheekOnepagerWizard() {
               Even jezelf voorstellen
             </h2>
             <p className="mt-2 text-sm text-[#6f6b64]">
-              Alleen wat relevant is voor je situatieschets.
+              Alleen wat relevant is voor je hypotheekoverzicht.
             </p>
 
             <div className="mt-6 flex flex-col gap-5">
@@ -1315,47 +1364,17 @@ export function HypotheekOnepagerWizard() {
                 </div>
               </fieldset>
 
-              <fieldset className="border-0 p-0">
-                <legend className="text-sm font-medium text-[#2c2a26]">
-                  Rookt u? <span className="font-normal text-[#6f6b64]">(optioneel)</span>
-                </legend>
-                <div className="mt-2 flex gap-2">
-                  {(["nee", "ja"] as const).map((v) => (
-                    <button
-                      key={v}
-                      type="button"
-                      onClick={() => setRookt(v)}
-                      className={cardBtn + " flex-1 text-center"}
-                      style={{
-                        borderColor: rookt === v ? AMBER : CARD_BORDER,
-                        background: rookt === v ? `${AMBER}14` : BG,
-                        color: GREEN,
-                      }}
-                    >
-                      {v === "ja" ? "Ja" : "Nee"}
-                    </button>
-                  ))}
-                </div>
-                <div className="mt-3">
-                  <InfoHint title="Waarom vragen we dit?">
-                    Bij een overlijdensrisicoverzekering kan roken invloed hebben op premie en
-                    acceptatie. Als je dit nu niet invult, bespreek het gewoon met je adviseur.
-                  </InfoHint>
-                </div>
-              </fieldset>
-
-              {(kinderenJaNee !== null || rookt !== null) && (
+              {kinderenJaNee !== null && (
                 <button
                   type="button"
                   onClick={() => {
                     setKinderenJaNee(null);
-                    setRookt(null);
                     setKinderenFieldError(null);
                   }}
                   className="text-left text-xs font-medium underline-offset-2 hover:underline"
                   style={{ color: GREEN }}
                 >
-                  Optionele antwoorden wissen
+                  Optioneel antwoord wissen
                 </button>
               )}
             </div>
@@ -2000,190 +2019,22 @@ export function HypotheekOnepagerWizard() {
           </div>
         )}
 
-        {/* Step 7 */}
-        {step === 7 && (
+        {/* Laatste stap: formulier open, PDF als kleine uitweg */}
+        {step === 9 && (
           <div>
             <h2 className="font-display text-xl font-normal sm:text-2xl" style={{ color: GREEN }}>
-              Een paar korte vragen
+              Wil je weten wat jouw cijfers betekenen?
             </h2>
-            <p className="mt-2 text-sm text-[#6f6b64]">
-              Helpt de adviseur om het gesprek goed af te stemmen. Mag je overslaan.
-            </p>
-
-            <div className="mt-6 flex flex-col gap-6">
-              {(
-                [
-                  {
-                    label: "Weet u wat uw inkomen wordt als u met pensioen gaat?",
-                    val: pensioenAware,
-                    set: setPensioenAware,
-                  },
-                  {
-                    label: "Weet u wat er gebeurt met uw inkomen bij werkloosheid?",
-                    val: werkloosheidAware,
-                    set: setWerkloosheidAware,
-                  },
-                  {
-                    label: "Weet u wat er gebeurt bij arbeidsongeschiktheid?",
-                    val: aoAware,
-                    set: setAoAware,
-                  },
-                ] as const
-              ).map((row) => (
-                <fieldset key={row.label}>
-                  <legend className="text-sm font-medium text-[#2c2a26]">{row.label}</legend>
-                  <div className="mt-2 flex flex-wrap gap-2">
-                    {(["niet", "redelijk", "goed"] as const).map((v) => (
-                      <button
-                        key={v}
-                        type="button"
-                        onClick={() => row.set(v)}
-                        className={cardBtn + " text-xs"}
-                        style={{
-                          borderColor: row.val === v ? AMBER : CARD_BORDER,
-                          background: row.val === v ? `${AMBER}14` : BG,
-                          color: GREEN,
-                        }}
-                      >
-                        {v === "niet" ? "Niet" : v === "redelijk" ? "Redelijk" : "Goed"}
-                      </button>
-                    ))}
-                  </div>
-                </fieldset>
-              ))}
-
-              <fieldset>
-                <legend className="text-sm font-medium">Heeft u eerder een hypotheek afgesloten?</legend>
-                <div className="mt-2 flex gap-2">
-                  {(["nee", "ja"] as const).map((v) => (
-                    <button
-                      key={v}
-                      type="button"
-                      onClick={() => setEerderHypotheek(v)}
-                      className={cardBtn + " flex-1"}
-                      style={{
-                        borderColor: eerderHypotheek === v ? AMBER : CARD_BORDER,
-                        background: eerderHypotheek === v ? `${AMBER}14` : BG,
-                        color: GREEN,
-                      }}
-                    >
-                      {v === "ja" ? "Ja" : "Nee"}
-                    </button>
-                  ))}
-                </div>
-              </fieldset>
-
-              <div>
-                <p className="text-sm font-medium">Hoe beoordeelt u uw eigen financiële kennis?</p>
-                <div className="mt-2 grid gap-2 sm:grid-cols-2">
-                  {(
-                    [
-                      { id: "laag" as const, label: "Laag" },
-                      { id: "redelijk" as const, label: "Redelijk" },
-                      { id: "goed" as const, label: "Goed" },
-                      { id: "zeer-goed" as const, label: "Zeer goed" },
-                    ]
-                  ).map((o) => (
-                    <button
-                      key={o.id}
-                      type="button"
-                      onClick={() => setFinancieleKennis(o.id)}
-                      className={cardBtn}
-                      style={{
-                        borderColor: financieleKennis === o.id ? AMBER : CARD_BORDER,
-                        background: financieleKennis === o.id ? `${AMBER}14` : BG,
-                        color: GREEN,
-                      }}
-                    >
-                      {o.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Step 8 — PDF lokaal; adviseur als aanbevolen optie */}
-        {step === 8 && (
-          <div>
-            <h2 className="font-display text-xl font-normal sm:text-2xl" style={{ color: GREEN }}>
-              Laatste stap
-            </h2>
-            <p className="mt-2 text-sm text-[#6f6b64]">
-              Je PDF wordt direct op je apparaat gedownload.
-            </p>
             <p className="mt-3 text-sm leading-relaxed text-[#5c5852]">
-              Veel mensen laten hun situatieschets <strong className="font-medium text-[#2c2a26]">kort checken</strong>{" "}
-              — zo voorkom je dat je iets mist.
+              Je overzicht is klaar. Een erkend hypotheekadviseur kan vrijblijvend met je meekijken en
+              uitleg geven over jouw persoonlijke hypotheekmogelijkheden.
             </p>
-
-            <div className="mt-6 border-t pt-6" style={{ borderColor: CARD_BORDER }}>
-              <p className="text-base font-semibold text-[#2c2a26]">
-                Laat je situatieschets kort checken{" "}
-                <span className="font-display text-primary">(aanrader)</span>
-              </p>
-              <p className="mt-1 text-xs leading-snug text-[#6f6b64]">
-                Kleine verschillen in je situatieschets kunnen later duizenden euro&apos;s schelen — een korte blik helpt
-                vaak om dat te voorkomen.
-              </p>
-
-              <div className="mt-5 flex flex-col gap-5">
-                <div>
-                  <p className="text-[11px] font-semibold uppercase tracking-wider text-primary/90">
-                    Aanrader · meest gekozen
-                  </p>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setZoektHypotheekAdvies("ja");
-                      setStep(9);
-                    }}
-                    className={
-                      cardBtn +
-                      " mt-2 flex min-h-[auto] w-full flex-col gap-1 py-4 text-left sm:min-h-[112px] sm:justify-center"
-                    }
-                    style={{
-                      borderColor: zoektHypotheekAdvies === "ja" ? AMBER : CARD_BORDER,
-                      background: zoektHypotheekAdvies === "ja" ? `${AMBER}22` : BG,
-                      boxShadow:
-                        zoektHypotheekAdvies === "ja" ? `0 0 0 1px ${AMBER}55 inset` : undefined,
-                    }}
-                  >
-                    <span style={{ color: GREEN }}>Ja, laat een adviseur meekijken (gratis)</span>
-                    <span className="text-xs font-normal leading-snug text-[#6f6b64]">
-                      Check op gemiste ruimte, risico&apos;s en je volgende stap
-                    </span>
-                  </button>
-                </div>
-
-                <div>
-                  <p className="text-[11px] font-semibold uppercase tracking-wide text-[#6f6b64]">
-                    Of regel het zelf
-                  </p>
-                  <button
-                    type="button"
-                    onClick={() => setZoektHypotheekAdvies("nee")}
-                    className={
-                      cardBtn +
-                      " mt-2 flex min-h-[auto] w-full flex-col gap-1 py-4 text-left sm:min-h-[112px] sm:justify-center"
-                    }
-                    style={{
-                      borderColor: zoektHypotheekAdvies === "nee" ? AMBER : CARD_BORDER,
-                      background: zoektHypotheekAdvies === "nee" ? `${AMBER}14` : BG,
-                    }}
-                  >
-                    <span style={{ color: GREEN }}>Alleen mijn PDF downloaden</span>
-                    <span className="text-xs font-normal leading-snug text-[#6f6b64]">
-                      Ga zelf verder met je voorbereiding
-                    </span>
-                    <span className="text-[11px] font-normal leading-snug text-[#8a8580]">
-                      Zonder extra check
-                    </span>
-                  </button>
-                </div>
-              </div>
-            </div>
+            <p className="mt-3 text-xs font-medium text-[#4a4844]">
+              Binnen 1 werkdag reactie · Geen verplichting · Geen offerte
+            </p>
+            <p className="mt-3 text-sm leading-relaxed text-[#6f6b64]">
+              Het overzicht is van jou. Het gesprek is optioneel.
+            </p>
 
             <div className="hidden" aria-hidden="true">
               <label>
@@ -2192,39 +2043,14 @@ export function HypotheekOnepagerWizard() {
               </label>
             </div>
 
-            <p className="mt-6 text-xs leading-relaxed text-[#6f6b64]">
-              Je situatieschets wordt op je apparaat gegenereerd. Kies hierboven of je alleen de PDF wilt,
-              of ook contact met een adviseur — bij dat laatste vul je op de volgende stap je gegevens in.{" "}
-              <Link href="/privacy" className="font-semibold underline" style={{ color: GREEN }}>
-                Privacy &amp; voorwaarden
-              </Link>
-              .
-            </p>
-          </div>
-        )}
-
-        {/* Stap 9 — alleen na „Ja“; contact + juridische toelichting (geen apart vinkje) */}
-        {step === 9 && (
-          <div>
-            <h2 className="font-display text-xl font-normal sm:text-2xl" style={{ color: GREEN }}>
-              Contact voor adviseur
-            </h2>
-            <p className="mt-2 text-sm text-[#6f6b64]">
-              Je PDF maak je zo meteen — vul hieronder in hoe we je kunnen bereiken voor een korte meekijk.
-            </p>
-
-            <div className="mt-6 flex flex-col gap-5 border-t pt-6" style={{ borderColor: CARD_BORDER }}>
+            <div className="mt-6 flex flex-col gap-4 border-t pt-6" style={{ borderColor: CARD_BORDER }}>
               <div>
-                <p className="text-sm font-semibold text-[#2c2a26]">Hoe wil je bereikbaar zijn?</p>
+                <p className="text-sm font-semibold text-[#2c2a26]">Hoe mogen we je bereiken?</p>
                 <p className="mt-1 text-xs leading-relaxed text-[#6f6b64]">
-                  Vul je naam en contact in — zo kan een adviseur je terugmailen of bellen.
-                </p>
-                <p className="mt-2 text-xs font-medium text-[#4a4844]">
-                  Binnen 1 werkdag reactie. Geen verplichtingen.
+                  Vul je gegevens in. Een adviseur neemt binnen 1 werkdag contact met je op.
                 </p>
               </div>
-
-              <div className="flex flex-col gap-4">
+              <div className="grid gap-4 sm:grid-cols-2">
                 <label className="flex flex-col gap-1 text-sm font-medium">
                   Voornaam *
                   <input
@@ -2245,62 +2071,85 @@ export function HypotheekOnepagerWizard() {
                     autoComplete="family-name"
                   />
                 </label>
-                <label className="flex flex-col gap-1 text-sm font-medium">
-                  E-mailadres *
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    onBlur={validateEmailBlur}
-                    className="min-h-[44px] rounded-xl border px-3"
-                    style={{ borderColor: CARD_BORDER }}
-                    autoComplete="email"
-                  />
-                  {emailError && <span className="text-xs text-red-600">{emailError}</span>}
-                </label>
-                <label className="flex flex-col gap-1 text-sm font-medium">
-                  Telefoonnummer *
-                  <input
-                    type="tel"
-                    placeholder="06 –"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    className="min-h-[44px] rounded-xl border px-3"
-                    style={{ borderColor: CARD_BORDER }}
-                    autoComplete="tel"
-                  />
-                </label>
-                <label className="flex flex-col gap-1 text-sm font-medium">
-                  Opmerkingen <span className="font-normal text-[#6f6b64]">(optioneel)</span>
-                  <textarea
-                    value={notes}
-                    maxLength={300}
-                    onChange={(e) => setNotes(e.target.value)}
-                    rows={3}
-                    placeholder="Bijv. voorkeur voor contactmoment…"
-                    className="rounded-xl border px-3 py-2 text-sm"
-                    style={{ borderColor: CARD_BORDER }}
-                  />
-                  <span className="text-xs text-[#6f6b64]">{notes.length}/300</span>
-                </label>
               </div>
+              <label className="flex flex-col gap-1 text-sm font-medium">
+                E-mailadres *
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  onBlur={validateEmailBlur}
+                  className="min-h-[44px] rounded-xl border px-3"
+                  style={{ borderColor: CARD_BORDER }}
+                  autoComplete="email"
+                />
+                {emailError && <span className="text-xs text-red-600">{emailError}</span>}
+              </label>
+              <label className="flex flex-col gap-1 text-sm font-medium">
+                Telefoonnummer *
+                <input
+                  type="tel"
+                  placeholder="06 –"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  className="min-h-[44px] rounded-xl border px-3"
+                  style={{ borderColor: CARD_BORDER }}
+                  autoComplete="tel"
+                />
+              </label>
+              <label className="flex flex-col gap-1 text-sm font-medium">
+                Opmerking <span className="font-normal text-[#6f6b64]">(optioneel)</span>
+                <textarea
+                  value={notes}
+                  maxLength={300}
+                  onChange={(e) => setNotes(e.target.value)}
+                  rows={3}
+                  placeholder="Bijv. voorkeur voor contactmoment…"
+                  className="rounded-xl border px-3 py-2 text-sm"
+                  style={{ borderColor: CARD_BORDER }}
+                />
+                <span className="text-xs text-[#6f6b64]">{notes.length}/300</span>
+              </label>
 
-              <div
-                className="rounded-xl border px-3 py-3 text-xs leading-relaxed text-[#5c5852] sm:px-4 sm:py-3.5"
-                style={{ borderColor: CARD_BORDER, background: BG }}
-              >
-                <p>
-                  Door te kiezen voor &quot;Ja, laat een adviseur meekijken&quot; op de vorige stap én het
-                  hierboven invullen van je contactgegevens, ga je ermee akkoord dat een{" "}
-                  <strong className="font-semibold text-[#2c2a26]">AFM-erkende hypotheekadviseur</strong>{" "}
-                  je mag bellen of mailen over deze situatieschets. Alleen voor dit verzoek, vrijblijvend —
-                  niet voor andere marketing.{" "}
-                  <Link href="/privacy" className="font-semibold underline" style={{ color: GREEN }}>
-                    Meer over privacy
-                  </Link>
-                  .
+              {leadMessage && (
+                <p className="text-sm font-medium text-red-700" role="alert">
+                  {leadMessage}
                 </p>
-              </div>
+              )}
+
+              <button
+                type="button"
+                onClick={() => void handleSubmitForm()}
+                disabled={submitBusy}
+                className="inline-flex min-h-[48px] w-full items-center justify-center rounded-xl px-6 text-sm font-semibold text-white shadow-md disabled:opacity-50"
+                style={{ background: GREEN }}
+              >
+                {submitBusy ? "Versturen…" : "Verstuur mijn verzoek →"}
+              </button>
+
+              <p className="text-xs leading-relaxed text-[#6f6b64]">
+                Door je verzoek te versturen geef je toestemming dat we je naam, e-mailadres,
+                telefoonnummer en de relevante gegevens uit je hypotheekoverzicht delen met een{" "}
+                <strong className="font-semibold text-[#2c2a26]">erkend hypotheekadviseur</strong>,
+                uitsluitend om je verzoek op te volgen. Je gegevens worden niet gebruikt voor andere
+                marketing. Je kunt je gegevens laten verwijderen via onze{" "}
+                <Link href="/privacy" className="font-semibold underline" style={{ color: GREEN }}>
+                  privacyverklaring
+                </Link>
+                .
+              </p>
+
+              <p className="pt-1 text-center text-xs text-[#8a857c]">
+                Liever alleen de PDF?{" "}
+                <button
+                  type="button"
+                  onClick={() => void handlePdfOnly()}
+                  disabled={downloadBusy}
+                  className="font-medium underline-offset-2 hover:underline disabled:opacity-60"
+                >
+                  {downloadBusy ? "PDF maken…" : "Download je overzicht"}
+                </button>
+              </p>
             </div>
           </div>
         )}
@@ -2320,6 +2169,11 @@ export function HypotheekOnepagerWizard() {
             Kies je dienstverband en vul een realistisch bruto jaarinkomen in (tussen € 15.000 en €
             500.000). Je mag €-notatie gebruiken: <strong className="font-medium text-[#5c5852]">55.000</strong>{" "}
             wordt automatisch gelezen als 55&nbsp;000.
+          </p>
+        )}
+        {step === 9 && contactAttempted && !step9Ok() && (
+          <p className="mt-6 text-xs leading-relaxed text-[#7a756c]" role="status">
+            Vul voornaam, achternaam, e-mailadres en telefoonnummer in (minimaal 9 cijfers).
           </p>
         )}
 
@@ -2346,7 +2200,7 @@ export function HypotheekOnepagerWizard() {
             >
               Volgende
             </button>
-          ) : step < 8 ? (
+          ) : step < 9 ? (
             <button
               type="button"
               onClick={() => {
@@ -2360,55 +2214,17 @@ export function HypotheekOnepagerWizard() {
             >
               Volgende
             </button>
-          ) : step === 8 ? (
-            zoektHypotheekAdvies === "nee" ? (
-              <button
-                type="button"
-                onClick={handleSubmitForm}
-                disabled={!step8Ok()}
-                className="inline-flex min-h-[44px] items-center justify-center rounded-xl px-6 text-sm font-semibold text-white shadow-md transition disabled:opacity-50"
-                style={{ background: GREEN }}
-              >
-                Maak mijn situatieschets
-              </button>
-            ) : zoektHypotheekAdvies === "ja" ? (
-              <button
-                type="button"
-                onClick={() => setStep(9)}
-                className="inline-flex min-h-[44px] items-center justify-center rounded-xl px-6 text-sm font-semibold text-white shadow-md transition"
-                style={{ background: GREEN }}
-              >
-                Contact invullen →
-              </button>
-            ) : (
-              <button
-                type="button"
-                disabled
-                className="inline-flex min-h-[44px] cursor-not-allowed items-center justify-center rounded-xl px-6 text-sm font-semibold text-white opacity-45 shadow-md"
-                style={{ background: GREEN }}
-              >
-                Maak mijn situatieschets
-              </button>
-            )
-          ) : step === 9 ? (
-            <button
-              type="button"
-              onClick={handleSubmitForm}
-              disabled={!step9Ok()}
-              className="inline-flex min-h-[44px] items-center justify-center rounded-xl px-6 text-sm font-semibold text-white shadow-md disabled:opacity-50"
-              style={{ background: GREEN }}
-            >
-              Maak mijn situatieschets
-            </button>
           ) : null}
         </div>
       </div>
 
+      {step < 9 && (
       <p className="mt-6 text-center text-xs text-[#6f6b64]">
         <Link href="/hypotheek" className="font-semibold underline-offset-2 hover:underline" style={{ color: GREEN }}>
           Alleen rekenen?
         </Link>
       </p>
+      )}
     </div>
   );
 }

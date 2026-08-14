@@ -14,7 +14,7 @@ import {
 export const metadata: Metadata = {
   title: "Hypotheekgids — begrijp het voordat je tekent",
   description:
-    "Gratis uitleg over hypotheken in gewone taal: basis, je gesprek voorbereiden, studieschuld en NHG. Geen hypotheekadvies — combineer met je situatieschets en rekenhulp.",
+    "Gratis uitleg over hypotheken in gewone taal: basis, je gesprek voorbereiden, studieschuld en NHG. Combineer met je hypotheekoverzicht en rekenhulp.",
   alternates: { canonical: "/gids" },
   keywords: [
     "hypotheekgids",
@@ -31,7 +31,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Hypotheekgids — Klaar voor advies",
     description:
-      "Begrijp hypotheekbegrippen vóór je tekent. Geen verkoop, geen persoonlijk advies — wél duidelijkheid voor je gesprek met een erkend adviseur.",
+      "Begrijp hypotheekbegrippen in gewone taal. Daarna je cijfers op papier, daarna het gesprek.",
   },
 };
 
@@ -151,14 +151,14 @@ export default function GidsHubPage() {
               Klaar om te beginnen?
             </h2>
             <p className="mt-3 text-sm leading-relaxed text-text-muted sm:text-base">
-              Gebruik de gids als achtergrond — en de situatieschets als je concrete voorbereiding.
+              De gids voor begrippen. Het overzicht voor jouw cijfers. Daarna het gesprek.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
               <Link
                 href="/situatieschets"
                 className="inline-flex min-h-[48px] items-center justify-center rounded-full bg-primary px-8 py-3 text-sm font-semibold text-white shadow-md transition hover:bg-primary-deep"
               >
-                Maak mijn situatieschets
+                Maak mijn hypotheekoverzicht
               </Link>
               <Link
                 href="/hypotheek"
@@ -167,9 +167,6 @@ export default function GidsHubPage() {
                 Open de rekenhulp
               </Link>
             </div>
-            <p className="mt-8 text-xs leading-relaxed text-text-muted">
-              Geen financieel advies. Geen verplichtingen. Gewoon duidelijkheid.
-            </p>
           </div>
         </section>
       </main>

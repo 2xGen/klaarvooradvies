@@ -7,7 +7,7 @@ import { useState } from "react";
 const links = [
   { href: "/#hoe-het-werkt", label: "Hoe het werkt" },
   { href: "/gids", label: "Hypotheekgids" },
-  { href: "/situatieschets", label: "Situatieschets" },
+  { href: "/situatieschets", label: "Hypotheekoverzicht" },
   { href: "/hypotheek", label: "Rekenhulp" },
   { href: "/contact", label: "Contact" },
 ];
@@ -44,7 +44,7 @@ export function Navbar() {
             href="/situatieschets"
             className="hidden rounded-full bg-accent px-4 py-2.5 text-sm font-semibold text-foreground shadow-sm transition duration-200 hover:-translate-y-0.5 hover:bg-accent-deep hover:shadow-md sm:inline-flex"
           >
-            Situatieschets
+            Gratis overzicht
           </Link>
           <button
             type="button"
@@ -78,7 +78,7 @@ export function Navbar() {
                 className="block rounded-full bg-accent px-4 py-3 text-center text-sm font-semibold text-foreground shadow-sm"
                 onClick={() => setOpen(false)}
               >
-                Situatieschets
+                Gratis overzicht
               </Link>
             </li>
           </ul>
